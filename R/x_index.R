@@ -2,7 +2,7 @@
 #'
 #' @description Compute x index for an institution
 #'
-#' @param df A data frame object
+#' @param df A data frame object containing institutional data
 #' @param kw Column in df containing keywords
 #' @param id Column in df containing IDs
 #' @param cit Column in df containing citations
@@ -38,9 +38,15 @@
 x_index <- function(df, kw, id, cit, dlm = ";") {
 
   # Load dependent libraries
-  library(tidyr)
-  library(Matrix)
-  library(agop)
+  if (!requireNamespace("Matrix", quietly = TRUE)) {
+    stop("Package 'Matrix' is required but not installed.")
+  }
+  if (!requireNamespace("agop", quietly = TRUE)) {
+    stop("Package 'agop' is required but not installed.")
+  }
+  if (!requireNamespace("tidyr", quietly = TRUE)) {
+    stop("Package 'tidyr' is required but not installed.")
+  }
 
   dat <- data.frame(kwc = df[[kw]], idc = df[[id]], ctc = df[[cit]])
 

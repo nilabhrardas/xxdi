@@ -7,7 +7,7 @@
 xd_index(df, cat, id, cit, dlm = ";")
 }
 \arguments{
-\item{df}{A data frame object}
+\item{df}{A data frame object containing institutional data}
 
 \item{cat}{Data frame column containing categories}
 

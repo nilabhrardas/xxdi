@@ -2,7 +2,7 @@
 #'
 #' @description Compute xd index for an institution
 #'
-#' @param df A data frame object
+#' @param df A data frame object containing institutional data
 #' @param cat Data frame column containing categories
 #' @param id Data frame column containing IDs
 #' @param cit Data frame column containing citations
@@ -38,9 +38,15 @@
 xd_index <- function(df, cat, id, cit, dlm = ";") {
 
   # Load dependent libraries
-  library(tidyr)
-  library(Matrix)
-  library(agop)
+  if (!requireNamespace("Matrix", quietly = TRUE)) {
+    stop("Package 'Matrix' is required but not installed.")
+  }
+  if (!requireNamespace("agop", quietly = TRUE)) {
+    stop("Package 'agop' is required but not installed.")
+  }
+  if (!requireNamespace("tidyr", quietly = TRUE)) {
+    stop("Package 'tidyr' is required but not installed.")
+  }
 
   dat <- data.frame(cat = df[[cat]], idc = df[[id]], ctc = df[[cit]])
 

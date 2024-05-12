@@ -7,7 +7,7 @@
 x_index(df, kw, id, cit, dlm = ";")
 }
 \arguments{
-\item{df}{A data frame object}
+\item{df}{A data frame object containing institutional data}
 
 \item{kw}{Column in df containing keywords}
 
