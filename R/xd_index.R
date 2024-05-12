@@ -11,15 +11,28 @@
 #' @return xd index value for institution
 #'
 #' @examples
-#' dat <- data.frame(citations = c(0, 1, 1, 2, 3, 5, 8),
-#'                   keywords = c("a; b; c", "b; d", "c", "d", "e; g", "f", "g"),
-#'                   id = c("abc123", "bcd234", "def345", "efg456", "fgh567", "ghi678", "hij789"),
-#'                   categories = c("a; d; e", "b", "c", "d; g", "e", "f", "g"))
-#' xd_index(df = dat, cat = "categories", id = "id", cit = "citations")
+#' dat1 <- data.frame(citations = c(0, 1, 1, 2, 3, 5, 8),
+#'                    keywords = c("a; b; c", "b; d", "c", "d", "e; g", "f", "g"),
+#'                    id = c("abc123", "bcd234", "def345", "efg456", "fgh567", "ghi678", "hij789"),
+#'                    categories = c("a; d; e", "b", "c", "d; g", "e", "f", "g"))
+#' xd_index(df = dat1, cat = "categories", id = "id", cit = "citations", dlm = ";")
+#'
+#' dat2 <- data.frame(citations = c(0, 1, 1, 2, 3, 5, 8),
+#'                   keywords = c("a/ b/ c", "b/ d", "c", "d", "e/ g", "f", "g"),
+#'                   id = c("123", "234", "345", "456", "567", "678", "789"),
+#'                   categories = c("a/ d/ e", "b", "c", "d/ g", "e", "f", "g"))
+#' xd_index(df = dat2, cat = "categories", id = "id", cit = "citations", dlm = "/")
+#'
+#' dat3 <- data.frame(citations = c(0, 1, 1, 2, 3, 5, 8),
+#'                   keywords = c("a, b, c", "b, d", "c", "d", "e, g", "f", "g"),
+#'                   id = c(123, 234, 345, 456, 567, 678, 789),
+#'                   categories = c("a: d: e", "b", "c", "d: g", "e", "f", "g"))
+#' xd_index(df = dat3, cat = "categories", id = "id", cit = "citations", dlm = ":")
 #' @export
 #' @importFrom tidyr separate_rows
 #' @importFrom Matrix colSums
 #' @importFrom agop index.h
+#' @importFrom stats na.omit
 
 # Function to calculate xd index
 xd_index <- function(df, cat, id, cit, dlm = ";") {
@@ -30,6 +43,11 @@ xd_index <- function(df, cat, id, cit, dlm = ";") {
   library(agop)
 
   dat <- data.frame(cat = df[[cat]], idc = df[[id]], ctc = df[[cit]])
+
+  #Change structure
+  dat$kwc <- as.character(dat$cat)
+  dat$idc <- as.character(dat$idc)
+  dat$ctc <- as.numeric(dat$ctc)
 
   # Clean dataset
   df_separated <- separate_rows(dat, cat, sep = dlm)

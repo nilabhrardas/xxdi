@@ -6,20 +6,33 @@
 #' @param kw Column in df containing keywords
 #' @param id Column in df containing IDs
 #' @param cit Column in df containing citations
-#' @param dlm Delimiter in kw_col. Default delimiter set to ";"
+#' @param dlm Delimiter in kw_col. Default set to ";"
 #'
 #' @return x index value for institution
 #'
 #' @examples
-#' dat <- data.frame(citations = c(0, 1, 1, 2, 3, 5, 8),
-#'                   keywords = c("a; b; c", "b; d", "c", "d", "e; g", "f", "g"),
-#'                   id = c("abc123", "bcd234", "def345", "efg456", "fgh567", "ghi678", "hij789"),
-#'                   categories = c("a; d; e", "b", "c", "d; g", "e", "f", "g"))
-#' x_index(df = dat, kw = "keywords", id = "id", cit = "citations")
+#' dat1 <- data.frame(citations = c(0, 1, 1, 2, 3, 5, 8),
+#'                    keywords = c("a; b; c", "b; d", "c", "d", "e; g", "f", "g"),
+#'                    id = c("abc123", "bcd234", "def345", "efg456", "fgh567", "ghi678", "hij789"),
+#'                    categories = c("a; d; e", "b", "c", "d; g", "e", "f", "g"))
+#' x_index(df = dat1, kw = "keywords", id = "id", cit = "citations", dlm = ";")
+#'
+#' dat2 <- data.frame(citations = c(0, 1, 1, 2, 3, 5, 8),
+#'                   keywords = c("a/ b/ c", "b/ d", "c", "d", "e/ g", "f", "g"),
+#'                   id = c("123", "234", "345", "456", "567", "678", "789"),
+#'                   categories = c("a/ d/ e", "b", "c", "d/ g", "e", "f", "g"))
+#' x_index(df = dat2, kw = "keywords", id = "id", cit = "citations", dlm = "/")
+#'
+#' dat3 <- data.frame(citations = c(0, 1, 1, 2, 3, 5, 8),
+#'                   keywords = c("a, b, c", "b, d", "c", "d", "e, g", "f", "g"),
+#'                   id = c(123, 234, 345, 456, 567, 678, 789),
+#'                   categories = c("a: d: e", "b", "c", "d: g", "e", "f", "g"))
+#' x_index(df = dat3, kw = "keywords", id = "id", cit = "citations", dlm = ",")
 #' @export x_index
 #' @importFrom tidyr separate_rows
 #' @importFrom Matrix colSums
 #' @importFrom agop index.h
+#' @importFrom stats na.omit
 
 # Function to calculate x index
 x_index <- function(df, kw, id, cit, dlm = ";") {
@@ -30,6 +43,11 @@ x_index <- function(df, kw, id, cit, dlm = ";") {
   library(agop)
 
   dat <- data.frame(kwc = df[[kw]], idc = df[[id]], ctc = df[[cit]])
+
+  #Change structure
+  dat$kwc <- as.character(dat$kwc)
+  dat$idc <- as.character(dat$idc)
+  dat$ctc <- as.numeric(dat$ctc)
 
   # Clean dataset
   df_separated <- separate_rows(dat, kwc, sep = dlm)

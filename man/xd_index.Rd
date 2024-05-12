@@ -24,9 +24,21 @@ xd index value for institution
 Compute xd index for an institution
 }
 \examples{
-dat <- data.frame(citations = c(0, 1, 1, 2, 3, 5, 8),
-                  keywords = c("a; b; c", "b; d", "c", "d", "e; g", "f", "g"),
-                  id = c("abc123", "bcd234", "def345", "efg456", "fgh567", "ghi678", "hij789"),
-                  categories = c("a; d; e", "b", "c", "d; g", "e", "f", "g"))
-xd_index(df = dat, cat = "categories", id = "id", cit = "citations")
+dat1 <- data.frame(citations = c(0, 1, 1, 2, 3, 5, 8),
+                   keywords = c("a; b; c", "b; d", "c", "d", "e; g", "f", "g"),
+                   id = c("abc123", "bcd234", "def345", "efg456", "fgh567", "ghi678", "hij789"),
+                   categories = c("a; d; e", "b", "c", "d; g", "e", "f", "g"))
+xd_index(df = dat1, cat = "categories", id = "id", cit = "citations", dlm = ";")
+
+dat2 <- data.frame(citations = c(0, 1, 1, 2, 3, 5, 8),
+                  keywords = c("a/ b/ c", "b/ d", "c", "d", "e/ g", "f", "g"),
+                  id = c("123", "234", "345", "456", "567", "678", "789"),
+                  categories = c("a/ d/ e", "b", "c", "d/ g", "e", "f", "g"))
+xd_index(df = dat2, cat = "categories", id = "id", cit = "citations", dlm = "/")
+
+dat3 <- data.frame(citations = c(0, 1, 1, 2, 3, 5, 8),
+                  keywords = c("a, b, c", "b, d", "c", "d", "e, g", "f", "g"),
+                  id = c(123, 234, 345, 456, 567, 678, 789),
+                  categories = c("a: d: e", "b", "c", "d: g", "e", "f", "g"))
+xd_index(df = dat3, cat = "categories", id = "id", cit = "citations", dlm = ":")
 }
