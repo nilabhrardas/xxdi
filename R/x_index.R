@@ -1,0 +1,60 @@
+#' @title x_index
+#'
+#' @description Compute x index for an institution
+#'
+#' @param df A data frame object
+#' @param kw Column in df containing keywords
+#' @param id Column in df containing IDs
+#' @param cit Column in df containing citations
+#' @param dlm Delimiter in kw_col. Default delimiter set to ";"
+#'
+#' @return x index value for institution
+#'
+#' @examples
+#' dat <- data.frame(citations = c(0, 1, 1, 2, 3, 5, 8),
+#'                   keywords = c("a; b; c", "b; d", "c", "d", "e; g", "f", "g"),
+#'                   id = c("abc123", "bcd234", "def345", "efg456", "fgh567", "ghi678", "hij789"),
+#'                   categories = c("a; d; e", "b", "c", "d; g", "e", "f", "g"))
+#' x_index(df = dat, kw = "keywords", id = "id", cit = "citations")
+#' @export x_index
+#' @importFrom tidyr separate_rows
+#' @importFrom Matrix colSums
+#' @importFrom agop index.h
+
+# Function to calculate x index
+x_index <- function(df, kw, id, cit, dlm = ";") {
+
+  # Load dependent libraries
+  library(tidyr)
+  library(Matrix)
+  library(agop)
+
+  dat <- data.frame(kwc = df[[kw]], idc = df[[id]], ctc = df[[cit]])
+
+  # Clean dataset
+  df_separated <- separate_rows(dat, kwc, sep = dlm)
+
+  df_separated <- data.frame(lapply(df_separated, function(x) ifelse(x == "", NA, x)))
+
+  df_sep <- na.omit(df_separated)
+
+  # Filter out unique keywords and unique WOS IDs
+  unique_keywords <- unique(trimws(df_sep$kwc))
+  unique_ids <- unique(df_sep$idc)
+
+  # Create an empty matrix with rows for unique IDs and columns for unique keywords
+  citation_matrix <- matrix(0, nrow = length(unique_ids), ncol = length(unique_keywords),
+                            dimnames = list(unique_ids, unique_keywords))
+
+  # Fill the matrix with citation numbers
+  for (i in 1:nrow(df_sep)) {
+    col_name <- trimws(df_sep$kwc[i])
+    row_name <- df_sep$idc[i]
+    citation_matrix[row_name, col_name] <- df_sep$ctc[df_sep$idc == row_name & trimws(df_sep$kwc) == col_name]
+  }
+
+  # Form a vector of the column sums without the names of the columns
+  col_sum_citation_matrix <- unname(colSums(citation_matrix))
+
+  return(index.h(col_sum_citation_matrix))
+}
