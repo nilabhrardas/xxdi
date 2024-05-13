@@ -1,14 +1,14 @@
 #' @title x_index
 #'
-#' @description Compute x index for an institution
+#' @description Compute x-index for an institution from an edge list
 #'
-#' @param df A data frame object containing institutional data
+#' @param df A data frame object containing bibliometric data
 #' @param kw Column in df containing keywords
 #' @param id Column in df containing IDs
 #' @param cit Column in df containing citations
-#' @param dlm Delimiter in kw_col. Default set to ";"
+#' @param dlm Delimiter in kw. Default set to ";"
 #'
-#' @return x index value for institution
+#' @return x-index value for institution
 #'
 #' @examples
 #' dat1 <- data.frame(citations = c(0, 1, 1, 2, 3, 5, 8),
@@ -48,22 +48,22 @@ x_index <- function(df, kw, id, cit, dlm = ";") {
     stop("Package 'tidyr' is required but not installed.")
   }
 
-  dat <- data.frame(kwc = df[[kw]], idc = df[[id]], ctc = df[[cit]])
+  dat <- data.frame(kw = df[[kw]], idc = df[[id]], ctc = df[[cit]])
 
   #Change structure
-  dat$kwc <- as.character(dat$kwc)
+  dat$kw <- as.character(dat$kw)
   dat$idc <- as.character(dat$idc)
   dat$ctc <- as.numeric(dat$ctc)
 
   # Clean dataset
-  df_separated <- separate_rows(dat, kwc, sep = dlm)
+  df_separated <- separate_rows(dat, kw, sep = dlm)
 
   df_separated <- data.frame(lapply(df_separated, function(x) ifelse(x == "", NA, x)))
 
   df_sep <- na.omit(df_separated)
 
   # Filter out unique keywords and unique WOS IDs
-  unique_keywords <- unique(trimws(df_sep$kwc))
+  unique_keywords <- unique(trimws(df_sep$kw))
   unique_ids <- unique(df_sep$idc)
 
   # Create an empty matrix with rows for unique IDs and columns for unique keywords
@@ -72,9 +72,9 @@ x_index <- function(df, kw, id, cit, dlm = ";") {
 
   # Fill the matrix with citation numbers
   for (i in 1:nrow(df_sep)) {
-    col_name <- trimws(df_sep$kwc[i])
+    col_name <- trimws(df_sep$kw[i])
     row_name <- df_sep$idc[i]
-    citation_matrix[row_name, col_name] <- df_sep$ctc[df_sep$idc == row_name & trimws(df_sep$kwc) == col_name]
+    citation_matrix[row_name, col_name] <- df_sep$ctc[df_sep$idc == row_name & trimws(df_sep$kw) == col_name]
   }
 
   # Form a vector of the column sums without the names of the columns

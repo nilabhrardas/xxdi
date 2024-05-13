@@ -7,21 +7,21 @@
 xd_index(df, cat, id, cit, dlm = ";")
 }
 \arguments{
-\item{df}{A data frame object containing institutional data}
+\item{df}{A data frame object containing bibliometric data}
 
-\item{cat}{Data frame column containing categories}
+\item{cat}{Column in df containing categories}
 
-\item{id}{Data frame column containing IDs}
+\item{id}{Column in df containing IDs}
 
-\item{cit}{Data frame column containing citations}
+\item{cit}{Column in df containing citations}
 
-\item{dlm}{Delimiter in cat_col. Default delimiter set to ";"}
+\item{dlm}{Delimiter in cat. Default delimiter set to ";"}
 }
 \value{
-xd index value for institution
+xd-index value for institution
 }
 \description{
-Compute xd index for an institution
+Compute xd-index for an institution from an edge list
 }
 \examples{
 dat1 <- data.frame(citations = c(0, 1, 1, 2, 3, 5, 8),

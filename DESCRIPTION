@@ -1,14 +1,17 @@
 Package: xxdi
 Type: Package
-Title: Calculate x and xd Indices
+Title: Calculate x- and xd-indices
 Version: 0.0.1
 Authors@R: c(
               person("Nilabhra Rohan", "Das", email = "nr.das@yahoo.com", role = c("cre", "aut")),
               person("Abhirup", "Nandy", email = "abhirupnandy.online@gmail.com", role = c("aut"))
               )
-Maintainer: <nr.das@yahoo.com>
-Description: More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
+Maintainer: Nilabhra Rohan Das <nr.das@yahoo.com>
+Description: The package offers functionality to compute two novel indices: the x-index and the xd-index. 
+  The x-index evaluates an institution's scholarly expertise within a specific discipline or field, 
+  while the xd-index provides a broader assessment of overall scholarly expertise considering an institution's 
+  publication pattern and strengths across coarse thematic areas. These indices offer a nuanced understanding of 
+  institutional research capabilities, aiding stakeholders in research management and resource allocation decisions.
 License: GPL-3
 Depends: 
     R (>= 4.3.3.0)

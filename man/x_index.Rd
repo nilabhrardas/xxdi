@@ -7,7 +7,7 @@
 x_index(df, kw, id, cit, dlm = ";")
 }
 \arguments{
-\item{df}{A data frame object containing institutional data}
+\item{df}{A data frame object containing bibliometric data}
 
 \item{kw}{Column in df containing keywords}
 
@@ -15,13 +15,13 @@ x_index(df, kw, id, cit, dlm = ";")
 
 \item{cit}{Column in df containing citations}
 
-\item{dlm}{Delimiter in kw_col. Default set to ";"}
+\item{dlm}{Delimiter in kw. Default set to ";"}
 }
 \value{
-x index value for institution
+x-index value for institution
 }
 \description{
-Compute x index for an institution
+Compute x-index for an institution from an edge list
 }
 \examples{
 dat1 <- data.frame(citations = c(0, 1, 1, 2, 3, 5, 8),
