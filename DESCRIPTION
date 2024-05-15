@@ -1,6 +1,6 @@
 Package: xxdi
 Type: Package
-Title: Calculate 'x-index' and 'xd-index'
+Title: Calculate Expertise Indices
 Version: 0.0.1
 Authors@R: c(
               person("Nilabhra Rohan", "Das", email = "nr.das@yahoo.com", role = c("cre", "aut")),
