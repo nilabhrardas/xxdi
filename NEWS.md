@@ -1,3 +1,11 @@
+# xxdi 1.1.0
+
+* Added function for calculating novel xc-index.
+* Added functions for calculating h-index and g-index.
+* Optimised functions for better performance and faster run times.
+
+--------------------------------------------------------------------------------
+
 # xxdi 1.0.0
 
 * Added new functionality for visualising plots for x- and xd-indices. 

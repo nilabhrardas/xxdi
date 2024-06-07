@@ -15,7 +15,7 @@ xd_index(df, cat, id, cit, dlm = ";", plot = FALSE)
 
 \item{cit}{Character string specifying the name of the column in "df" that contains the number of citations each document has received. Citations must be represented as integers. Each cell in this column should contain a single integer value (unless missing) representing the citation count for the corresponding document.}
 
-\item{dlm}{Character string specifying the delimiter used in the "cat" column to separate multiple categories within a single cell. The delimiter should be consistent across the entire "cat" column. Common delimiters include ";", "/", ":", and ",". The default delimiter is ";".}
+\item{dlm}{Character string specifying the delimiter used in the "cat" column to separate multiple categories within a single cell. The delimiter should be consistent across the entire "cat" column. Common delimiters include ";", "/", ":", and ",". The default delimiter is set to ";".}
 
 \item{plot}{Logical value indicating whether to generate and display a plot of the xd-index calculation. Set to TRUE or T to generate the plot, and FALSE or F to skip plot generation. The default is FALSE.}
 }

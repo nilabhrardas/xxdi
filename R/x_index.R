@@ -6,7 +6,7 @@
 #' @param kw Character string specifying the name of the column in "df" that contains keywords. Each cell in this column may contain no keywords (missing), a single keyword or multiple keywords separated by a specified delimiter.
 #' @param id Character string specifying the name of the column in "df" that contains unique identifiers for each document. Each cell in this column must contain a single ID (unless missing) and not multiple IDs.
 #' @param cit Character string specifying the name of the column in "df" that contains the number of citations each document has received. Citations must be represented as integers. Each cell in this column should contain a single integer value (unless missing) representing the citation count for the corresponding document.
-#' @param dlm Character string specifying the delimiter used in the "kw" column to separate multiple keywords within a single cell. The delimiter should be consistent across the entire "kw" column. Common delimiters include ";", "/", ":", and ",". The default delimiter is ";".
+#' @param dlm Character string specifying the delimiter used in the "kw" column to separate multiple keywords within a single cell. The delimiter should be consistent across the entire "kw" column. Common delimiters include ";", "/", ":", and ",". The default delimiter is set to ";".
 #' @param plot Logical value indicating whether to generate and display a plot of the x-index calculation. Set to TRUE or T to generate the plot, and FALSE or F to skip plot generation. The default is FALSE.
 #'
 #' @return x-index value and plot for institution.
@@ -31,7 +31,15 @@
 #' x_index(df = dat3, kw = "keywords", id = "id", cit = "citations", dlm = ",", plot = TRUE)
 #' @export x_index
 #' @importFrom tidyr separate_rows
+#' @importFrom dplyr %>%
+#' @importFrom dplyr arrange
+#' @importFrom dplyr desc
+#' @importFrom dplyr filter
+#' @importFrom dplyr mutate
+#' @importFrom dplyr row_number
+#' @importFrom dplyr select
 #' @importFrom Matrix colSums
+#' @importFrom Matrix sparseMatrix
 #' @importFrom agop index.h
 #' @importFrom stats na.omit
 #' @importFrom ggplot2 aes
@@ -47,7 +55,7 @@
 # Function to calculate x-index
 x_index <- function(df, kw, id, cit, dlm = ";", plot = FALSE) {
 
-  # Load dependent libraries
+  # Load required libraries
   if (!requireNamespace("Matrix", quietly = TRUE)) {
     stop("Package 'Matrix' is required but not installed.")
   }
@@ -60,58 +68,55 @@ x_index <- function(df, kw, id, cit, dlm = ";", plot = FALSE) {
   if (!requireNamespace("ggplot2", quietly = TRUE)) {
     stop("Package 'ggplot2' is required but not installed.")
   }
-
-  dat <- data.frame(kw = df[[kw]], idc = df[[id]], cit = df[[cit]])
-
-  #Change structure
-  dat$kw <- as.character(dat$kw)
-  dat$idc <- as.character(dat$idc)
-  dat$cit <- as.numeric(dat$cit)
-
-  # Clean dataset
-  df_separated <- separate_rows(dat, kw, sep = dlm)
-
-  df_separated <- data.frame(lapply(df_separated, function(x) ifelse(x == "", NA, x)))
-
-  df_sep <- na.omit(df_separated)
-
-  # Filter out unique keywords and unique WOS IDs
-  unique_keywords <- unique(trimws(df_sep$kw))
-  unique_ids <- unique(df_sep$idc)
-
-  # Create an empty matrix with rows for unique IDs and columns for unique keywords
-  citation_matrix <- matrix(0, nrow = length(unique_ids), ncol = length(unique_keywords),
-                            dimnames = list(unique_ids, unique_keywords))
-
-  # Fill the matrix with citation numbers
-  for (i in 1:nrow(df_sep)) {
-    col_name <- trimws(df_sep$kw[i])
-    row_name <- df_sep$idc[i]
-    citation_matrix[row_name, col_name] <- df_sep$cit[df_sep$idc == row_name & trimws(df_sep$kw) == col_name]
+  if (!requireNamespace("dplyr", quietly = TRUE)) {
+    stop("Package 'dplyr' is required but not installed.")
   }
 
-  # Form a vector of the column sums without the names of the columns
-  col_sum_citation_matrix <- unname(colSums(citation_matrix))
+  # Working data frame
+  dat <- df %>%
+    select(kw = {{kw}}, id = {{id}}, cit = {{cit}}) %>%
+    mutate(kw = as.character(kw), id = as.character(id), cit = as.numeric(cit)) %>%
+    na.omit()
+
+  # Clean dataset
+  dat <- dat %>%
+    separate_rows(kw, sep = dlm) %>%
+    filter(kw != "") %>%
+    na.omit()
+
+  # Create unique keywords and IDs
+  unique_keywords <- unique(trimws(dat$kw))
+  unique_ids <- unique(dat$id)
+
+  # Create a sparse matrix
+  citation_matrix <- sparseMatrix(
+    i = match(dat$id, unique_ids),
+    j = match(trimws(dat$kw), unique_keywords),
+    x = dat$cit,
+    dims = c(length(unique_ids), length(unique_keywords)),
+    dimnames = list(unique_ids, unique_keywords)
+  )
+
+  # Sum citations for each keyword
+  col_sum_citation_matrix <- colSums(citation_matrix)
 
   # Calculate x-index
-  x_index <- index.h(col_sum_citation_matrix)
+  x_index <- index.h(unname(col_sum_citation_matrix))
 
   if (plot) {
     # Prepare data for plotting
-    df <- data.frame(kw = colnames(citation_matrix), cit = col_sum_citation_matrix)
-    df <- df[order(df$cit, decreasing = TRUE), ]
-    df$kw <- factor(df$kw, levels = df$kw)
+    df_plot <- data.frame(kw = names(col_sum_citation_matrix), cit = col_sum_citation_matrix) %>%
+      arrange(desc(cit)) %>%
+      mutate(kw = factor(kw, levels = kw))
 
     # Create and print ggplot for x-index
-    print(
-      ggplot(df) +
-        geom_point(aes(x = kw, y = cit), shape = 16) +
-        geom_hline(yintercept = x_index, color = "#ff0000", linetype = 2) +
-        xlab("Keywords") +
-        ylab("Total Citations") +
-        ggtitle(label = "x-index") +
-        theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5))
-    )
+    print(ggplot(df_plot) +
+            geom_point(aes(x = kw, y = cit), shape = 16) +
+            geom_hline(yintercept = x_index, color = "#ff0000", linetype = 2) +
+            xlab("Keywords") +
+            ylab("Total Citations") +
+            ggtitle(label = "x-index") +
+            theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5)))
   }
 
   # Return value

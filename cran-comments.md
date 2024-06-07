@@ -3,7 +3,5 @@
 0 errors | 0 warnings | 0 notes
 
 * This is a version update.
-* Added authors' ORCiD.
-* Changes in function descriptions and function parameter descriptions.
-* Changes in package description.
-* Fixed mis-nomenclature of variables within functions.
+* Fixed error in authors' ORCiD.
+* Added new functions.
