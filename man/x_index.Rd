@@ -17,30 +17,36 @@ x_index(df, kw, id, cit, dlm = ";", plot = FALSE)
 
 \item{dlm}{Character string specifying the delimiter used in the "kw" column to separate multiple keywords within a single cell. The delimiter should be consistent across the entire "kw" column. Common delimiters include ";", "/", ":", and ",". The default delimiter is set to ";".}
 
-\item{plot}{Logical value indicating whether to generate and display a plot of the x-index calculation. Set to TRUE or T to generate the plot, and FALSE or F to skip plot generation. The default is FALSE.}
+\item{plot}{Logical value indicating whether to generate and display a plot of the x-index calculation. Set to "TRUE" or "T" to generate the plot, and "FALSE" or "F" to skip plot generation. The default is "FALSE".}
 }
 \value{
 x-index value and plot for institution.
 }
 \description{
-This function calculates the x-index for an institution using bibliometric data from an edge list, with an optional plot visualisation.
+This is a standalone function that specifically calculates the x-index for an institution using bibliometric data from an edge list, with an optional plot visualisation. The function is suitable for including inside loops when plotting parameter is set to "FALSE" or "F".
 }
 \examples{
+# Create an example data frame
 dat1 <- data.frame(citations = c(0, 1, 1, 2, 3, 5, 8),
                    keywords = c("a; b; c", "b; d", "c", "d", "e; g", "f", "g"),
                    id = c("abc123", "bcd234", "def345", "efg456", "fgh567", "ghi678", "hij789"),
                    categories = c("a; d; e", "b", "c", "d; g", "e", "f", "g"))
+# Calculate x-index
 x_index(df = dat1, kw = "keywords", id = "id", cit = "citations")
 
+# Create another example data frame
 dat2 <- data.frame(citations = c(0, 1, 1, 2, 3, 5, 8),
                   keywords = c("a/ b/ c", "b/ d", "c", "d", "e/ g", "f", "g"),
                   id = c("123", "234", "345", "456", "567", "678", "789"),
                   categories = c("a/ d/ e", "b", "c", "d/ g", "e", "f", "g"))
+# Calculate x-index
 x_index(df = dat2, kw = "keywords", id = "id", cit = "citations", dlm = "/", plot = FALSE)
 
+# Create another example data frame
 dat3 <- data.frame(citations = c(0, 1, 1, 2, 3, 5, 8),
                   keywords = c("a, b, c", "b, d", "c", "d", "e, g", "f", "g"),
                   id = c(123, 234, 345, 456, 567, 678, 789),
                   categories = c("a: d: e", "b", "c", "d: g", "e", "f", "g"))
+# Calculate x-index and produce plot
 x_index(df = dat3, kw = "keywords", id = "id", cit = "citations", dlm = ",", plot = TRUE)
 }

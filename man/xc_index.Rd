@@ -21,18 +21,20 @@ xc_index(df, kw, cat, id, cit, kdlm = ";", cdlm = ";", plot = FALSE)
 
 \item{cdlm}{Character string specifying the delimiter used in the "cat" column to separate multiple categories within a single cell. The delimiter should be consistent across the entire "cat" column. Common delimiters include ";", "/", ":", and ",". The default delimiter is set to ";".}
 
-\item{plot}{Logical value indicating whether to generate and display a plot of the x-index calculation. Set to TRUE or T to generate the plot, and FALSE or F to skip plot generation. The default is FALSE.}
+\item{plot}{Logical value indicating whether to generate and display a plot of the xc-index calculation. Set to "TRUE" or "T" to generate the plot, and "FALSE" or "F" to skip plot generation. The default is "FALSE".}
 }
 \value{
 xc-index value and plot for institution.
 }
 \description{
-This function calculates the xc-index for an institution using bibliometric data from an edge list, with an optional plot visualisation.
+This is a standalone function that specifically calculates the xc-index for an institution using bibliometric data from an edge list, with an optional plot visualisation. The function is suitable for including inside loops when plotting parameter is set to "FALSE" or "F".
 }
 \examples{
+# Create an example data frame
 dat1 <- data.frame(citations = c(0, 1, 1, 2, 3, 5, 8),
                    keywords = c("a; b; c", "b; d", "c", "d", "e; g", "f", "g"),
                    id = c("abc123", "bcd234", "def345", "efg456", "fgh567", "ghi678", "hij789"),
                    categories = c("a; d; e", "b", "c", "d; g", "e", "f", "g"))
+# Calculate xc-index and produce plot
 xc_index(df = dat1, kw = "keywords", cat = "categories", id = "id", cit = "citations", plot = TRUE)
 }

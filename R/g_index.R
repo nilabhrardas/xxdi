@@ -5,27 +5,33 @@
 #' @param df Data frame object containing bibliometric data. This data frame must have at least three columns: one for keywords, one for unique IDs, and one for citation counts. Each row in the data frame should represent a document or publication.
 #' @param id Character string specifying the name of the column in "df" that contains unique identifiers for each document. Each cell in this column must contain a single ID (unless missing) and not multiple IDs.
 #' @param cit Character string specifying the name of the column in "df" that contains the number of citations each document has received. Citations must be represented as integers. Each cell in this column should contain a single integer value (unless missing) representing the citation count for the corresponding document.
-#' @param plot Logical value indicating whether to generate and display a plot of the g-index calculation. Set to TRUE or T to generate the plot, and FALSE or F to skip plot generation. The default is FALSE.
+#' @param plot Logical value indicating whether to generate and display a plot of the g-index calculation. Set to "TRUE" or "T" to generate the plot, and "FALSE" or "F" to skip plot generation. The default is "FALSE".
 #'
 #' @return g-index value and plot for institution.
 #'
 #' @examples
+#' # Create an example data frame
 #' dat1 <- data.frame(citations = c(0, 1, 1, 2, 3, 5, 8),
 #'                    keywords = c("a; b; c", "b; d", "c", "d", "e; g", "f", "g"),
 #'                    id = c("abc123", "bcd234", "def345", "efg456", "fgh567", "ghi678", "hij789"),
 #'                    categories = c("a; d; e", "b", "c", "d; g", "e", "f", "g"))
+#' # Calculate g-index
 #' g_index(df = dat1, id = "id", cit = "citations")
 #'
+#' # Create another example data frame
 #' dat2 <- data.frame(citations = c(0, 1, 1, 2, 3, 5, 8),
 #'                   keywords = c("a/ b/ c", "b/ d", "c", "d", "e/ g", "f", "g"),
 #'                   id = c("123", "234", "345", "456", "567", "678", "789"),
 #'                   categories = c("a/ d/ e", "b", "c", "d/ g", "e", "f", "g"))
+#' # Calculate g-index
 #' g_index(df = dat2, id = "id", cit = "citations", plot = FALSE)
 #'
+#' # Create another example data frame
 #' dat3 <- data.frame(citations = c(0, 1, 1, 2, 3, 5, 8),
 #'                   keywords = c("a, b, c", "b, d", "c", "d", "e, g", "f", "g"),
 #'                   id = c(123, 234, 345, 456, 567, 678, 789),
 #'                   categories = c("a: d: e", "b", "c", "d: g", "e", "f", "g"))
+#' # Calculate g-index and produce plot
 #' g_index(df = dat3, id = "id", cit = "citations", plot = TRUE)
 #' @export g_index
 #' @importFrom dplyr %>%
