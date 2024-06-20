@@ -192,7 +192,7 @@ xdc_index <- function(df, p1, p2 = NULL, id, cit, dlm1 = ";", dlm2 = ";") {
     # Sum citations for each keyword
     col_sum_citation_matrix <- colSums(citation_matrix)
 
-    # Calculate x-index
+    # Calculate xdc-index
     xdc_index <- index.h(unname(col_sum_citation_matrix))
 
     # Return value

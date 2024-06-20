@@ -4,6 +4,7 @@
 * Added a generic function 'xdc_index' which can be used to calculate x-index, xd-index, and xc-index.
 * Added functions 'h_index' and 'g_index' for calculating h-index and g-index respectively.
 * Optimised functions for better performance and faster run times.
+* Fixed author's ORCiD.
 
 --------------------------------------------------------------------------------
 

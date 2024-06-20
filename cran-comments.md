@@ -5,3 +5,4 @@
 * This is a version update.
 * Fixed error in authors' ORCiD.
 * Added new functions.
+* Further optimised function run times.
