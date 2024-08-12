@@ -1,7 +1,7 @@
 Package: xxdi
 Type: Package
 Title: Calculate Expertise Indices
-Version: 1.1.0
+Version: 1.2.3
 Authors@R: c(
     person("Nilabhra Rohan", "Das", , "nr.das@yahoo.com", role = c("cre", "aut"), comment = c(ORCID = "0000-0001-8187-0080")),
     person("Abhirup", "Nandy", , "abhirupnandy.online@gmail.com", role = "aut", comment = c(ORCID = "0000-0001-8618-0847"))

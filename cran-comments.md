@@ -2,7 +2,5 @@
 
 0 errors | 0 warnings | 0 notes
 
-* This is a version update.
-* Fixed error in authors' ORCiD.
-* Added new functions.
-* Further optimised function run times.
+* This is a version update
+* Added options to change index type to h or g
