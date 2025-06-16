@@ -60,12 +60,6 @@ h_index <- function(df, id = NULL, cit, plot = FALSE) {
     stop("Package 'stats' is required but not installed.")
   }
 
-  # load the packages for use
-  require(agop)
-  require(dplyr)
-  require(ggplot2)
-  require(stats)
-
   if (is.null(id)) {
     # Working data frame
     dat <- df %>%

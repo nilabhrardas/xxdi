@@ -59,12 +59,6 @@ g_index <- function(df, id = NULL, cit, plot = FALSE) {
     stop("Package 'stats' is required but not installed.")
   }
 
-  # load packages
-  require(agop)
-  require(dplyr)
-  require(ggplot2)
-  require(stats)
-
   ### MAIN FUNCTION
   if (is.null(id)) {
     # Working data frame

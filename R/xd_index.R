@@ -70,14 +70,6 @@ xd_index <- function(df, cat, id, cit, type = "h", dlm = ";", plot = FALSE) {
     stop("Package 'stats' is required but not installed.")
   }
 
-  # load packages
-  require(Matrix)
-  require(agop)
-  require(tidyr)
-  require(ggplot2)
-  require(dplyr)
-  require(stats)
-
   # Working data frame
   dat <- df %>%
     dplyr::select(cat = {{cat}}, id = {{id}}, cit = {{cit}}) %>%
