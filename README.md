@@ -552,6 +552,7 @@ For this variant, the input data frame must contain a variable 'inst_count', whi
 set.seed(123)
 WoSdata$inst_count <- runif(n = 2355, min = 1, max = 10)
 
+# compute fractional xd-index
 xd_index(df = WoSdata,
          id = "UT.Unique.WOS.ID",
          cat = "WoS.Categories",
