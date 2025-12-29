@@ -65,7 +65,7 @@ x_index(df = WoSdata,
         id = "UT.Unique.WOS.ID",
         kw = "Keywords.Plus",
         cit = "Times.Cited.WoS.Core",
-        plot = TRUE)
+        plot = FALSE)
 ```
 
 Output:
@@ -214,7 +214,7 @@ xc_index(df = WoSdata,
          kw = "Keywords.Plus",
          cat = "WoS.Categories",
          cit = "Times.Cited.WoS.Core",
-         plot = TRUE)
+         plot = FALSE)
 ```
 
 Output:
@@ -491,7 +491,7 @@ xd_index(df = WoSdata,
          id = "UT.Unique.WOS.ID",
          cat = "WoS.Categories",
          cit = "Times.Cited.WoS.Core",
-         plot = TRUE)
+         plot = FALSE)
 ```
 
 Output:
@@ -558,7 +558,7 @@ xd_index(df = WoSdata,
          cat = "WoS.Categories",
          cit = "Times.Cited.WoS.Core",
          variant = "f",
-         plot = TRUE)
+         plot = FALSE)
 ```
 
 Output:
@@ -614,7 +614,7 @@ xd_index(df = WoSdata,
          cit = "Times.Cited.WoS.Core",
          mfc = NULL,
          variant = "FN",
-         plot = TRUE)
+         plot = FALSE)
 ```
 
 Output:
@@ -657,7 +657,7 @@ ivw_xd_index(df = WoSdata,
              cat = "WoS.Categories",
              cit = "Times.Cited.WoS.Core",
              vfc = NULL,
-             plot = TRUE)
+             plot = FALSE)
 ```
 
 Output:
