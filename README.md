@@ -55,7 +55,7 @@ In the above output, each row represents a distinct publication entry. Each publ
 *Note: Missings values (*NA*s) are addressed internally within each function, so we can ignore those for now.*
 
 ### Calculate expertise indices
-Now, we will use this example data to calculate the expertise indices and their vairants for this scholarly institution. The expertise index functions illstrated below output a list of two vectors: one that gives the magnitude of the index (say 'x'), and another that gives the list of the top 'x' thematic areas.
+Now, we will use this example data to calculate the expertise indices and their vairants for this scholarly institution. The expertise index functions illstrated below output a list of two vectors: one that gives the magnitude of the index (say 'x'), and another that gives the list of the top 'x' thematic areas. For example, the 'x_index()' function, used to calculate the x-index, returns a '$x.index' which is the magnitude or value of the x-index and a '$x.ketwords' which is the list of the top cited keywords that reach the x-index threshold.
 
 #### $x$-index
 The $x$-index is a measure of thematic area expertise depth and is computed using the indexed keywords. To compute the $x$-index, we use the 'x_index()' function:
@@ -542,7 +542,7 @@ $xd.categories
 [79] "Physiology"                                       "Engineering, Biomedical"                         
 ```
 
-#### Fractional xd-index
+#### Fractional $x_d$-index
 The fractional $x_d$-index is a variant of the $x_d$-index adjusted for per-publication contributing institutions to account for multi-institution bias, i.e., bias due to multiple institutions contributing to a publication which can potentially increase exposure and citations.
 
 For this variant, the input data frame must contain a variable 'inst_count', which gives the number of institutions that contributed to each publication. Since the example data is institution-specific, it does not include a variable giving the number of institutions contributing to each publication. To demonstrate the impact of multi-institutional collaborations, we will create a random variable as appropriate. To compute the fractional $x_d$-index, we use the 'xd_index()' function, and set the 'variant' parameter to "f":
@@ -602,7 +602,7 @@ $xd.categories
 
 ```
 
-#### Field-normalised xd-index
+#### Field-normalised $x_d$-index
 The field-normalised $x_d$-index is a variant of the $x_d$-index adjusted for mean field citations to account for field-bias, i.e., bias due to rate of citation being different in different fields or research.
 
 For this variant, the population mean is usually preferred, the mean field citations at the global context. The population means, if available, may be provided as a data frame into the 'mfc' input parameter. However, in the absense of population means, the function will automatically calculate sample means as appropriate. For this example, we will use the sample means to adjust for field-bias. To compute the field-normalised $x_d$-index, we use the 'xd_index()' function, and set the 'variant' parameter to "FN":
@@ -646,7 +646,7 @@ $xd.categories
 [33] "Materials Science, Biomaterials"       
 ```
 
-#### Inverse variance weighted xd-index
+#### Inverse variance weighted $x_d$-index
 Similar to the field-normalised $x_d$-index, the inverse variance weighted (IVW) $x_d$-index is a variant of the $x_d$-index adjusted for field citation variance to account for field-bias.
 
 Again, although the population level variance is desireable, provided as a data frame into the'vfc' input parameter, it may be substituted by sample variances when unavailable. For this example, we will use the sample variances to adjust for field-bias. To compute the IVW $x_d$-index, we use the 'ivw_xd_index()' function:
@@ -680,6 +680,8 @@ $ivw.xd.categories
  [9] "Meteorology & Atmospheric Sciences"            "Materials Science, Characterization & Testing"
 [11] "Limnology"             
 ```
+#### $h$-index and $g$-index
+Finally, any bibliometric package would be incomplete without the traditional $h$- and $g$-indices. Hence, this package also includes the functions 'h_index()' and 'g_index()' to compute the $h$- and $g$-indices, respectively. These are just rebranded versions of similar functions available in the 'agop' R pacakge with the added functionality of an optional plot to maintain consistency within our package. 
 
 ### Bug reports and improvements
 Bug reports, feature requests, and suggestions for improvement are always welcome. Please report issues and propose enhancements via the project repository or via email (n.das@uq.edu.au). User feedback is essential for the continued development and refinement of this package.
