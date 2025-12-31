@@ -23,7 +23,7 @@
 #' @param type "h" (default) for Hirsch's h-type index or "g" for Egghe's g-type index.
 #' @param dlm Character string specifying the delimiter used in the "cat" column
 #'  to separate multiple categories within a single cell. The delimiter should be
-#'  consistent across the entire "cat" column. Common delimiters include ";" (defualt), "/",
+#'  consistent across the entire "cat" column. Common delimiters include ";" (default), "/",
 #'  ":", and ",".
 #' @param variant One of "full" (default), "f", or "FN".
 #' \itemize{
@@ -224,3 +224,4 @@ xd_index <- function(df,
   return(list(xd.index = xd_val,
               xd.categories = core_keywords))
 }
+
