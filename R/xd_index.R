@@ -1,126 +1,226 @@
-#' @title xd_index
+#' @title xd_index - Expertise Diversity (xd-) Index
 #'
-#' @description Calculates xd-index for an institution using bibliometric data from an edge list, with an optional visualisation of ranked citation scores. The function is suitable for including inside loops when plotting parameter is set to "FALSE" or "F".
+#' @description
+#' Calculate the xd-index (and its variants, field-normalized and fractional)
+#' for an institution using bibliometric data from an edge list, with an optional
+#' visualisation of ranked citation scores.
 #'
-#' @param df Data frame object containing bibliometric data. This data frame must have at least three columns: one for categories, one for unique IDs, and one for citation counts. Each row in the data frame should represent a document or publication.
-#' @param cat Character string specifying the name of the column in "df" that contains categories. Each cell in this column may contain no categories (missing), a single category or multiple categories separated by a specified delimiter.
-#' @param id Character string specifying the name of the column in "df" that contains unique identifiers for each document. Each cell in this column must contain a single ID (unless missing) and not multiple IDs.
-#' @param cit Character string specifying the name of the column in "df" that contains the number of citations each document has received. Citations must be represented as integers. Each cell in this column should contain a single integer value (unless missing) representing the citation count for the corresponding document.
-#' @param type "h" for Hirsch's h-type index or "g" for Egghe's g-type index. Default set to "h".
-#' @param dlm Character string specifying the delimiter used in the "cat" column to separate multiple categories within a single cell. The delimiter should be consistent across the entire "cat" column. Common delimiters include ";", "/", ":", and ",". The default delimiter is set to ";".
-#' @param plot Logical value indicating whether to generate and display a plot of the xd-index calculation. Set to "TRUE" or "T" to generate the plot, and "FALSE" or "F" to skip plot generation. The default is "FALSE".
+#' @param df Data frame object containing bibliometric data. Must have at least
+#'  three columns: one for categories, one for unique IDs, and one for citation
+#'  counts.
+#' @param cat Character string specifying the name of the column in "df" that contains categories.
+#'  Categories can be multiple separated by a delimiter.
+#' @param id Character string specifying the name of the column in "df" that
+#'  contains unique identifiers for each document. Each cell in this column must
+#'  contain a single ID (unless missing) and not multiple IDs.
+#' @param cit Character string specifying the name of the column in "df" that
+#'  contains the number of citations each document has received. Citations must
+#'  be represented as integers. Each cell in this column should contain a single
+#'  integer value (unless missing) representing the citation count for the
+#'  corresponding document.
+#' @param mfc Data frame with columns 'cat' and 'mean_cit'. Optionally required to
+#'  utilise population means when variant set to "f".
+#' @param type "h" (default) for Hirsch's h-type index or "g" for Egghe's g-type index.
+#' @param dlm Character string specifying the delimiter used in the "cat" column
+#'  to separate multiple categories within a single cell. The delimiter should be
+#'  consistent across the entire "cat" column. Common delimiters include ";" (defualt), "/",
+#'  ":", and ",".
+#' @param variant One of "full" (default), "f", or "FN".
+#' \itemize{
+#'   \item \code{"full"} — Computes the unconditional xd-index.
+#'   \item \code{"f"} — Computes the fractional xd-index. If set to 'f', input data
+#'    frame 'df' must include an 'inst_count' column which gives the number of institutions
+#'    per publication.
+#'   \item \code{"FN"} — Computes the field-normalised xd-index. If set to 'FN', input
+#'    may optionally include an 'mfc' data frame  which gives the population
+#'    level mean citations for different fields. If not provided, sample mean field citations will be used.
+#' }
+#' @param plot Logical value indicating whether to generate and display a plot of
+#'  the xd-index calculation. Set to "TRUE" or "T" to generate the plot, and "FALSE" (default)
+#'  or "F" to skip plot generation.
 #'
-#' @return xd-index value and plot.
+#' @return xd-index magnitude, core categories, and optional plot.
 #'
 #' @examples
-#' # Create an example data frame
-#' dat1 <- data.frame(citations = c(0, 1, 1, 2, 3, 5, 8),
-#'                    keywords = c("a; b; c", "b; d", "c", "d", "e; g", "f", "g"),
-#'                    id = c("abc123", "bcd234", "def345", "efg456", "fgh567", "ghi678", "hij789"),
-#'                    categories = c("a; d; e", "b", "c", "d; g", "e", "f", "g"))
+#' # Load example data
+#' data(WoSdata)
 #'
-#' # Calculate h-type xd-index
-#' xd_index(df = dat1, cat = "categories", id = "id", cit = "citations")
+#' # Calculate xd-index with plot
+#' xd_index(df = WoSdata,
+#'          id = "UT.Unique.WOS.ID",
+#'          cat = "WoS.Categories",
+#'          cit = "Times.Cited.WoS.Core",
+#'          plot = TRUE)
 #'
-#' # Create another example data frame
-#' dat2 <- data.frame(citations = c(0, 1, 1, 2, 3, 5, 8),
-#'                    keywords = c("a/ b/ c", "b/ d", "c", "d", "e/ g", "f", "g"),
-#'                    id = c("123", "234", "345", "456", "567", "678", "789"),
-#'                    categories = c("a/ d/ e", "b", "c", "d/ g", "e", "f", "g"))
+#' # Calculate field-normalised xd-index with plot
+#' xd_index(df = WoSdata,
+#'          id = "UT.Unique.WOS.ID",
+#'          cat = "WoS.Categories",
+#'          cit = "Times.Cited.WoS.Core",
+#'          variant = "FN",
+#'          plot = TRUE)
 #'
-#' # Calculate g-type xd-index
-#' xd_index(df = dat2, cat = "categories", id = "id", cit = "citations", type = "g", dlm = "/")
+#' @export
 #'
-#' # Create another example data frame
-#' dat3 <- data.frame(citations = c(0, 1, 1, 2, 3, 5, 8),
-#'                    keywords = c("a, b, c", "b, d", "c", "d", "e, g", "f", "g"),
-#'                    id = c(123, 234, 345, 456, 567, 678, 789),
-#'                    categories = c("a: d: e", "b", "c", "d: g", "e", "f", "g"))
-#'
-#' # Calculate h-type xd-index and produce plot
-#' xd_index(df = dat3, cat = "categories", id = "id", cit = "citations", dlm = ":", plot = TRUE)
-#'
-#' @export xd_index
 #' @importFrom tidyr separate_rows
-#' @importFrom dplyr %>% arrange desc filter mutate row_number select
+#' @importFrom dplyr %>% arrange desc filter mutate row_number select left_join
 #' @importFrom Matrix colSums sparseMatrix
 #' @importFrom agop index.h index.g
 #' @importFrom stats na.omit
-#' @importFrom ggplot2 aes element_text geom_hline geom_point ggplot ggtitle theme xlab ylab
+#' @importFrom ggplot2 aes element_text geom_segment geom_point ggplot theme ggtitle xlab ylab
 
-xd_index <- function(df, cat, id, cit, type = "h", dlm = ";", plot = FALSE) {
+#### Main function ---
+xd_index <- function(df,
+                     cat,
+                     id,
+                     cit,
+                     mfc = NULL,
+                     type = "h",
+                     dlm = ";",
+                     variant = "full",
+                     plot = FALSE) {
 
-  # Load required libraries
-  if (!requireNamespace("Matrix", quietly = TRUE)) {
-    stop("Package 'Matrix' is required but not installed.")
-  }
-  if (!requireNamespace("agop", quietly = TRUE)) {
-    stop("Package 'agop' is required but not installed.")
-  }
-  if (!requireNamespace("tidyr", quietly = TRUE)) {
-    stop("Package 'tidyr' is required but not installed.")
-  }
-  if (!requireNamespace("ggplot2", quietly = TRUE)) {
-    stop("Package 'ggplot2' is required but not installed.")
-  }
-  if (!requireNamespace("dplyr", quietly = TRUE)) {
-    stop("Package 'dplyr' is required but not installed.")
-  }
-  if (!requireNamespace("stats", quietly = TRUE)) {
-    stop("Package 'stats' is required but not installed.")
+  # --- Package checks ---
+  for (pkg in c("Matrix","agop","tidyr","ggplot2","dplyr","stats")) {
+    if (!requireNamespace(pkg, quietly = TRUE)) {
+      stop("Package '", pkg, "' is required but not installed.")
+    }
   }
 
-  # Working data frame
+  # declare global variable
+  mean_cit <- NULL
+
+  # --- Helper: fractional variant ---
+  xd_index_fractional <- function(dat) {
+
+    dat$cit <- dat$cit / dat$inst_count
+
+    return(dat)
+  }
+
+
+  # --- Helper: field-normalized variant ---
+  xd_index_normalised <- function(dat, mfc) {
+
+    if (is.null(mfc)) {
+      message("'mfc' not provided. Computing category means from provided data.")
+
+      dat <- dat %>%
+        dplyr::group_by(cat) %>%
+        dplyr::mutate(mean_cit = mean(cit, na.rm = TRUE)) %>%
+        dplyr::ungroup()
+    } else {
+      dat <- dplyr::left_join(dat, mfc, by = "cat")
+    }
+
+    # check for zero means
+    mean_cit_zero <- sum(dat$mean_cit == 0, na.rm = TRUE)
+
+    if (mean_cit_zero > 0) {
+      message(paste0("Found zero mean citations for ", mean_cit_zero, " category(s)."))
+      message("Replacing with 0.01 to allow index calculations.")
+      message("It is recommended to check why category(s) produced zero means.")
+      dat$mean_cit[dat$mean_cit == 0] <- 0.01
+    }
+
+    # check for missing mean citations
+    mean_cit_na <- sum(is.na(dat$mean_cit))
+
+    if (mean_cit_na > 0) {
+      message(paste0("Found missing mean citations for ", mean_cit_na, " category(s). Excluding publication(s)."))
+      dat <- dat[!is.na(dat$mean_cit), ]
+    }
+
+    dat <- dat %>% dplyr::mutate(cit = cit / mean_cit)
+
+    return(dat)
+  }
+
+  # --- Working data frame ---
   dat <- df %>%
-    dplyr::select(cat = {{cat}}, id = {{id}}, cit = {{cit}}) %>%
-    dplyr::mutate(cat = as.character(cat), id = as.character(id), cit = as.numeric(cit)) %>%
+    dplyr::select(cat = {{cat}},
+                  id = {{id}},
+                  cit = {{cit}},
+                  dplyr::everything()) %>%
+    dplyr::mutate(cat = as.character(cat),
+                  id = as.character(id),
+                  cit = as.numeric(cit)) %>%
     stats::na.omit()
 
-  # Clean dataset
+  # check for institution count column in df
+  if (variant == "f") {
+    # If inst_count not provided, build it
+    if (!"inst_count" %in% colnames(dat)) {
+      stop("Institution counts per 'inst_count' not provided.")
+    }
+  }
+
+  # Split multiple categories
   dat <- dat %>%
     tidyr::separate_rows(cat, sep = dlm) %>%
+    dplyr::mutate(cat = trimws(cat)) %>%
     dplyr::filter(cat != "") %>%
     stats::na.omit()
 
-  # Create unique categories and IDs
-  unique_categories <- unique(trimws(dat$cat))
+  # --- Handle variants via helpers ---
+  if (variant == "FN") {
+    dat <- xd_index_normalised(dat, mfc)
+  } else if (variant == "f") {
+    dat <- xd_index_fractional(dat)
+  }
+
+  # --- Create sparse matrix ---
+  unique_categories <- unique(dat$cat)
   unique_ids <- unique(dat$id)
 
-  # Create a sparse matrix
-  citation_matrix <- Matrix::sparseMatrix(i = match(dat$id, unique_ids),
-                                          j = match(trimws(dat$cat), unique_categories),
-                                          x = dat$cit,
-                                          dims = c(length(unique_ids), length(unique_categories)),
-                                          dimnames = list(unique_ids, unique_categories)
-                                          )
+  citation_matrix <- Matrix::sparseMatrix(
+    i = match(dat$id, unique_ids),
+    j = match(dat$cat, unique_categories),
+    x = dat$cit,
+    dims = c(length(unique_ids), length(unique_categories)),
+    dimnames = list(unique_ids, unique_categories)
+  )
 
-  # Sum citations for each category
+  # --- Aggregate category strengths ---
   col_sum_citation_matrix <- Matrix::colSums(citation_matrix)
 
-  # Calculate xd-index
+  # --- Compute xd-index ---
   if (type == "h") {
-    xd_index <- agop::index.h(unname(col_sum_citation_matrix))
-  }
-  if (type == "g") {
-    xd_index <- agop::index.g(unname(col_sum_citation_matrix))
+    xd_val <- agop::index.h(unname(col_sum_citation_matrix))
+  } else if (type == "g") {
+    xd_val <- agop::index.g(unname(col_sum_citation_matrix))
+  } else {
+    stop("Invalid type. Use 'h' or 'g'.")
   }
 
+  # get keywords whose citation counts meet the index threshold
+  core_keywords <- names(col_sum_citation_matrix)[col_sum_citation_matrix >= xd_val]
+
+  # --- Plot (optional) ---
   if (plot) {
-    # Prepare data for plotting
-    df_plot <- data.frame(cat = names(col_sum_citation_matrix), cit = col_sum_citation_matrix) %>%
+    df_plot <- data.frame(cat = names(col_sum_citation_matrix),
+                          cit = col_sum_citation_matrix) %>%
       dplyr::arrange(dplyr::desc(cit)) %>%
       dplyr::mutate(cat = factor(cat, levels = cat))
 
-    # Create and print ggplot for xd-index
-    print(ggplot2::ggplot(df_plot) +
-            ggplot2::geom_point(ggplot2::aes(x = cat, y = cit), shape = 16) +
-            ggplot2::geom_hline(yintercept = xd_index, color = "#ff0000", linetype = 2) +
-            ggplot2::xlab("Categories") +
-            ggplot2::ylab("Total Citations") +
-            ggplot2::ggtitle(label = "xd-index") +
-            ggplot2::theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5)))
+    print(
+      ggplot2::ggplot(df_plot) +
+        ggplot2::geom_point(ggplot2::aes(x = cat, y = cit), shape = 16) +
+        ggplot2::geom_segment(x = xd_val,
+                              xend = xd_val,
+                              y = -Inf,
+                              yend = Inf,
+                              color = "#ff0000",
+                              linetype = 2) +
+        ggplot2::xlab("Categories") +
+        ggplot2::ylab(ifelse(variant == "f",
+                             "Total Fractional Citations",
+                             ifelse(variant == "FN", "Total Field-Normalised Citations", "Total Citations"))) +
+        ggplot2::ggtitle(label = paste("xd-index (variant:", variant, ")")) +
+        ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90, hjust = 1, vjust = 0.5))
+    )
   }
 
-  # Return value
-  return(xd_index)
+  return(list(xd.index = xd_val,
+              xd.categories = core_keywords))
 }
