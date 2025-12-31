@@ -14,6 +14,7 @@ install.packages("xxdi")
 # install the 'remotes' package if unavailable
 ifelse(requireNamespace("remotes", quietly = TRUE), TRUE, install.packages("remotes"))
 
+# install 'xxdi' from the github repo
 remotes::install_github("nilabhrardas/xxdi")
 ```
 
