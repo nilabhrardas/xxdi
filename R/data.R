@@ -4,7 +4,7 @@
 #' in India queried from the Web of Science (WoS) database. All publications, totalling
 #' 2,355 distinct publications, within a time frame of 10 years, spanning from 2011
 #' to 2020 were extracted. For these publications, additional information/metadata,
-#' namely the 'UT (Unique WOS ID)', 'Keywords Plus', 'WoS Categories', and 'Times
+#' namely the 'UT (Unique WoS ID)', 'Keywords Plus', 'WoS Categories', and 'Times
 #' Cited, WoS Core' fields, were also extracted.
 #'
 #' @format

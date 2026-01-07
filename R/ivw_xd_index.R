@@ -93,6 +93,7 @@ ivw_xd_index <- function(df,
   # Clean dataset
   dat <- dat %>%
     tidyr::separate_rows(cat, sep = dlm) %>%
+    dplyr::mutate(cat = trimws(cat)) %>%
     dplyr::filter(cat != "") %>%
     stats::na.omit()
 
@@ -102,14 +103,16 @@ ivw_xd_index <- function(df,
 
     dat <- dat %>%
       dplyr::group_by(cat) %>%
-      dplyr::mutate(var_cit = stats::var(cit, na.rm = TRUE)) %>%
-      dplyr::ungroup()
+      dplyr::mutate(var_cit = stats::var(cit, na.rm = TRUE))
   } else {
+    dat <- dat %>%
+      dplyr::group_by(cat)
+
     dat <- dplyr::left_join(dat, vfc, by = "cat")
   }
 
   # remove na variances
-  var_cit_na <- sum(is.na(dat$var_cit))
+  var_cit_na <- length(unique(dat$cat[is.na(dat$var_cit)]))
 
   if (var_cit_na > 0) {
     message(paste0("Variance cannot be computed for ", var_cit_na, " category(s)."))
@@ -120,10 +123,16 @@ ivw_xd_index <- function(df,
   }
 
   # Replace zero-variance categories (cannot be weighted)
-  var_cit_zero <- sum(dat$var_cit == 0, na.rm = TRUE)
+  var_cit_zero <- length(unique(dat$cat[dat$var_cit == 0]))
 
   if (var_cit_zero > 0) {
-    message(paste0("Found ", var_cit_zero, " category(s) with zero variance(s)."))
+
+    # print out zero variance categories
+    zero_var_idx <- dat$var_cit == 0
+    zero_var_cats <- unique(dat$cat[zero_var_idx])
+    message(paste0("Found ", var_cit_zero, " category(s) with zero variance(s): ",
+                   paste(zero_var_cats, collapse = "; ")))
+
     message("Replacing with '0.01' to allow index calculation.")
     message("It is recommended to check why category(s) produced zero variances.")
 
@@ -131,27 +140,16 @@ ivw_xd_index <- function(df,
   }
 
   # ivw citations
-  dat <- dat %>% dplyr::mutate(cit = cit / var_cit)
+  dat <- dat %>%
+    dplyr::mutate(cit = cit / var_cit)
 
-  # Create unique categories and IDs
-  unique_categories <- unique(trimws(dat$cat))
-  unique_ids <- unique(dat$id)
+  # Sum citations per category specific keyword
+  dat <- dat %>%
+    dplyr::summarise(total_cit = sum(cit), .groups = "drop")
 
-  # Step 1: Match IDs and Categories
-  i_indices <- match(dat$id, unique_ids)
-  j_indices <- match(trimws(dat$cat), unique_categories)
-
-  # Step 2: Create a dense matrix initialized with NA
-  dense_matrix <- matrix(NA, nrow = length(unique_ids), ncol = length(unique_categories),
-                         dimnames = list(unique_ids, unique_categories))
-
-  dense_matrix[cbind(i_indices, j_indices)] <- dat$cit
-
-  # rename matrix
-  citation_matrix <- dense_matrix
-
-  # Sum citations for each category
-  col_sum_citation_matrix <- Matrix::colSums(citation_matrix, na.rm = TRUE)
+  # Sum citations for each keyword
+  col_sum_citation_matrix <- dat$total_cit
+  names(col_sum_citation_matrix) <- dat$cat
 
   # Calculate xd-index
   if (type == "h") {
@@ -162,7 +160,8 @@ ivw_xd_index <- function(df,
   }
 
   # get keywords whose citation counts meet the index threshold
-  core_keywords <- names(col_sum_citation_matrix)[col_sum_citation_matrix >= ivw_xd_index]
+  cit_sorted <- sort(col_sum_citation_matrix, decreasing = TRUE)
+  core_keywords <- names(cit_sorted)[seq_len(ivw_xd_index)]
 
   if (plot) {
     # Prepare data for plotting

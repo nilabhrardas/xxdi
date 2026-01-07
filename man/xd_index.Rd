@@ -41,7 +41,7 @@ utilise population means when variant set to "f".}
 
 \item{dlm}{Character string specifying the delimiter used in the "cat" column
 to separate multiple categories within a single cell. The delimiter should be
-consistent across the entire "cat" column. Common delimiters include ";" (defualt), "/",
+consistent across the entire "cat" column. Common delimiters include ";" (default), "/",
 ":", and ",".}
 
 \item{variant}{One of "full" (default), "f", or "FN".

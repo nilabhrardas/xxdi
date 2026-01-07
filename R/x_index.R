@@ -93,20 +93,15 @@ x_index <- function(df,
     dplyr::filter(kw != "") %>%
     stats::na.omit()
 
-  # Create unique keywords and IDs
-  unique_keywords <- unique(trimws(dat$kw))
-  unique_ids <- unique(dat$id)
-
-  # Create a sparse matrix
-  citation_matrix <- Matrix::sparseMatrix(i = match(dat$id, unique_ids),
-                                          j = match(trimws(dat$kw), unique_keywords),
-                                          x = dat$cit,
-                                          dims = c(length(unique_ids), length(unique_keywords)),
-                                          dimnames = list(unique_ids, unique_keywords)
-                                          )
+  # Sum citations per keyword
+  dat <- dat %>%
+    dplyr::mutate(kw = trimws(kw)) %>%
+    dplyr::group_by(kw) %>%
+    dplyr::summarise(total_cit = sum(cit), .groups = "drop")
 
   # Sum citations for each keyword
-  col_sum_citation_matrix <- Matrix::colSums(citation_matrix)
+  col_sum_citation_matrix <- dat$total_cit
+  names(col_sum_citation_matrix) <- dat$kw
 
   # Calculate x-index
   if (type == "h") {
@@ -117,7 +112,8 @@ x_index <- function(df,
   }
 
   # get keywords whose citation counts meet the index threshold
-  core_keywords <- names(col_sum_citation_matrix)[col_sum_citation_matrix >= x_index]
+  cit_sorted <- sort(col_sum_citation_matrix, decreasing = TRUE)
+  core_keywords <- names(cit_sorted)[seq_len(x_index)]
 
   if (plot) {
     # Prepare data for plotting

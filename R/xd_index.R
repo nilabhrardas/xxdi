@@ -95,6 +95,9 @@ xd_index <- function(df,
 
     dat$cit <- dat$cit / dat$inst_count
 
+    dat <- dat %>%
+      dplyr::group_by(cat)
+
     return(dat)
   }
 
@@ -107,28 +110,35 @@ xd_index <- function(df,
 
       dat <- dat %>%
         dplyr::group_by(cat) %>%
-        dplyr::mutate(mean_cit = mean(cit, na.rm = TRUE)) %>%
-        dplyr::ungroup()
+        dplyr::mutate(mean_cit = mean(cit, na.rm = TRUE))
     } else {
+      dat <- dat %>%
+        dplyr::group_by(cat)
+
       dat <- dplyr::left_join(dat, mfc, by = "cat")
     }
 
-    # check for zero means
-    mean_cit_zero <- sum(dat$mean_cit == 0, na.rm = TRUE)
-
-    if (mean_cit_zero > 0) {
-      message(paste0("Found zero mean citations for ", mean_cit_zero, " category(s)."))
-      message("Replacing with 0.01 to allow index calculations.")
-      message("It is recommended to check why category(s) produced zero means.")
-      dat$mean_cit[dat$mean_cit == 0] <- 0.01
-    }
-
     # check for missing mean citations
-    mean_cit_na <- sum(is.na(dat$mean_cit))
+    mean_cit_na <- length(unique(dat$cat[is.na(dat$mean_cit)]))
 
     if (mean_cit_na > 0) {
       message(paste0("Found missing mean citations for ", mean_cit_na, " category(s). Excluding publication(s)."))
       dat <- dat[!is.na(dat$mean_cit), ]
+    }
+
+    # check for zero means
+    mean_cit_zero <- length(unique(dat$cat[dat$mean_cit == 0]))
+
+    if (mean_cit_zero > 0) {
+      # print out zero variance categories
+      zero_mean_idx <- dat$mean_cit == 0
+      zero_mean_cats <- unique(dat$cat[zero_mean_idx])
+      message(paste0("Found ", mean_cit_zero, " category(s) with zero variance(s): ",
+                     paste(zero_mean_cats, collapse = "; ")))
+
+      message("Replacing with 0.01 to allow index calculations.")
+      message("It is recommended to check why category(s) produced zero means.")
+      dat$mean_cit[dat$mean_cit == 0] <- 0.01
     }
 
     dat <- dat %>% dplyr::mutate(cit = cit / mean_cit)
@@ -167,22 +177,18 @@ xd_index <- function(df,
     dat <- xd_index_normalised(dat, mfc)
   } else if (variant == "f") {
     dat <- xd_index_fractional(dat)
+  } else {
+    dat <- dat %>%
+      dplyr::group_by(cat)
   }
 
-  # --- Create sparse matrix ---
-  unique_categories <- unique(dat$cat)
-  unique_ids <- unique(dat$id)
+  # Sum citations per category specific keyword
+  dat <- dat %>%
+    dplyr::summarise(total_cit = sum(cit), .groups = "drop")
 
-  citation_matrix <- Matrix::sparseMatrix(
-    i = match(dat$id, unique_ids),
-    j = match(dat$cat, unique_categories),
-    x = dat$cit,
-    dims = c(length(unique_ids), length(unique_categories)),
-    dimnames = list(unique_ids, unique_categories)
-  )
-
-  # --- Aggregate category strengths ---
-  col_sum_citation_matrix <- Matrix::colSums(citation_matrix)
+  # Sum citations for each keyword
+  col_sum_citation_matrix <- dat$total_cit
+  names(col_sum_citation_matrix) <- dat$cat
 
   # --- Compute xd-index ---
   if (type == "h") {
@@ -194,7 +200,8 @@ xd_index <- function(df,
   }
 
   # get keywords whose citation counts meet the index threshold
-  core_keywords <- names(col_sum_citation_matrix)[col_sum_citation_matrix >= xd_val]
+  cit_sorted <- sort(col_sum_citation_matrix, decreasing = TRUE)
+  core_keywords <- names(cit_sorted)[seq_len(xd_val)]
 
   # --- Plot (optional) ---
   if (plot) {
@@ -224,4 +231,3 @@ xd_index <- function(df,
   return(list(xd.index = xd_val,
               xd.categories = core_keywords))
 }
-

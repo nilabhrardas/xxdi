@@ -1,3 +1,10 @@
+# xxdi 1.3.1
+
+* Major performance upgrades.
+* Fixed issue where sometimes an inaccurate list of core keywords/categories were printed.
+
+--------------------------------------------------------------------------------
+
 # xxdi 1.3.0
 
 * Introduced different variants of the xd-index, such as fractional, field-normalised, and the inverse variance weighted xd-index.

@@ -88,6 +88,9 @@ xc_index <- function(df,
     stop("Package 'dplyr' is required but not installed.")
   }
 
+  # declare global variables
+  kc <- NULL
+
   # Working data frame
   dat <- df %>%
     dplyr::select(kw = {{kw}},
@@ -101,44 +104,41 @@ xc_index <- function(df,
   dat <- dat %>%
     tidyr::separate_rows(kw, sep = kdlm) %>%
     tidyr::separate_rows(cat, sep = cdlm) %>%
-    dplyr::mutate(kw = trimws(kw), cat = trimws(cat), kw = paste0(kw, " (", cat, ")")) %>%
+    dplyr::mutate(kw = trimws(kw), cat = trimws(cat)) %>%
     dplyr::filter(kw != "") %>%
+    dplyr::mutate(kc = paste0(kw, " (", cat, ")")) %>%
     stats::na.omit()
 
-  # Create unique keywords and IDs
-  unique_keywords <- unique(dat$kw)
-  unique_ids <- unique(dat$id)
+  # Sum citations per category specific keyword
+  dat <- dat %>%
+    dplyr::mutate(kc = trimws(kc)) %>%
+    dplyr::group_by(kc) %>%
+    dplyr::summarise(total_cit = sum(cit), .groups = "drop")
 
-  # Create a sparse matrix
-  citation_matrix <- Matrix::sparseMatrix(i = match(dat$id, unique_ids),
-                                          j = match(dat$kw, unique_keywords),
-                                          x = dat$cit,
-                                          dims = c(length(unique_ids), length(unique_keywords)),
-                                          dimnames = list(unique_ids, unique_keywords))
-
-  # Sum citations for each categorical keyword
-  col_sum_citation_matrix <- Matrix::colSums(citation_matrix)
+  # Sum citations for each keyword
+  col_sum_citation_matrix <- dat$total_cit
+  names(col_sum_citation_matrix) <- dat$kc
 
   # Calculate xc-index
   if (type == "h") {
     xc_index <- agop::index.h(unname(col_sum_citation_matrix))
-  }
-  if (type == "g") {
+  } else if (type == "g") {
     xc_index <- agop::index.g(unname(col_sum_citation_matrix))
   }
 
   # get keywords whose citation counts meet the index threshold
-  core_keywords <- names(col_sum_citation_matrix)[col_sum_citation_matrix >= xc_index]
+  cit_sorted <- sort(col_sum_citation_matrix, decreasing = TRUE)
+  core_keywords <- names(cit_sorted)[seq_len(xc_index)]
 
   if (plot) {
     # Prepare data for plotting
-    df_plot <- data.frame(kw = names(col_sum_citation_matrix), cit = col_sum_citation_matrix) %>%
+    df_plot <- data.frame(kc = names(col_sum_citation_matrix), cit = col_sum_citation_matrix) %>%
       dplyr::arrange(desc(cit)) %>%
-      dplyr::mutate(kw = factor(kw, levels = kw))
+      dplyr::mutate(kc = factor(kc, levels = kc))
 
     # Create and print ggplot for xc-index
     print(ggplot2::ggplot(df_plot) +
-            ggplot2::geom_point(ggplot2::aes(x = kw, y = cit), shape = 16) +
+            ggplot2::geom_point(ggplot2::aes(x = kc, y = cit), shape = 16) +
             ggplot2::geom_segment(x = xc_index,
                                   xend = xc_index,
                                   y = -Inf,
