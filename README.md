@@ -43,15 +43,15 @@ head(WoSdata)
 
 Output:
 ```
-# A tibble: 6 × 4
-  UT.Unique.WOS.ID    Keywords.Plus                        WoS.Categories Times.Cited.WoS.Core
-  <chr>               <chr>                                <chr>                         <dbl>
-1 WOS:000560355300001 ENCRYPTION; SEARCH                   Computer Scie…                    3
-2 WOS:000537414100011 16S RIBOSOMAL-RNA; POSTOPERATIVE EN… Microbiology                      3
-3 WOS:000508646000003 BLOOD-PRESSURE VARIABILITY; DIRECT … Pharmacology …                    3
-4 WOS:000509674900007 NA                                   Multidiscipli…                    3
-5 WOS:000492345900041 C-ELEGANS; MOLECULAR DOCKING; PROTE… Medicine, Res…                    3
-6 WOS:000485861500012 CARBON NANOTUBES; CONDUCTING POLYME… Multidiscipli…                    3
+# # A tibble: 6 × 5
+# UT.Unique.WOS.ID    Keywords.Plus                WoS.Categories Times.Cited.WoS.Core inst_count
+# <chr>               <chr>                        <chr>                         <dbl>      <dbl>
+# 1 WOS:000560355300001 ENCRYPTION; SEARCH           Computer Scie…                    3       3.59
+# 2 WOS:000537414100011 16S RIBOSOMAL-RNA; POSTOPER… Microbiology                      3       8.09
+# 3 WOS:000508646000003 BLOOD-PRESSURE VARIABILITY;… Pharmacology …                    3       4.68
+# 4 WOS:000509674900007 NA                           Multidiscipli…                    3       8.95
+# 5 WOS:000492345900041 C-ELEGANS; MOLECULAR DOCKIN… Medicine, Res…                    3       9.46
+# 6 WOS:000485861500012 CARBON NANOTUBES; CONDUCTIN… Multidiscipli…                    3       1.41
 ```
 
 In the above output, each row represents a distinct publication entry. Each publication is given a unique identifier, recorded in the 'UT.Unique.WOS.ID' column. 'Keywords.Plus' corresponds to the indexed keywords corresponding to the publication, 'WoS.Categories' corresponds to the indexed categories for the publication, and 'Times.Cited.WoS.Core' corresponds to the total number of citations received from publications indexed in the WoS database. These metadata are generally included for any dataset queried from the such databases. 
